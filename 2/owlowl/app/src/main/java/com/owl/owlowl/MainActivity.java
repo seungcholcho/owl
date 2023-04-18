@@ -69,19 +69,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initUI();
-        checkAndRequestPermissions();
         setContentView(R.layout.activity_main);
 
     }
-    private void initUI(){
-        mbtnRegister = (Button) findViewById(R.id.btnRegister);
-        //mbtnRegister.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View v) {
-        //        checkAndRequestPermissions();
-        //    }
-        //});
+    public void ButtonClick(View v){
+        checkAndRequestPermissions();
     }
     private void checkAndRequestPermissions() {
         // Check for permissions
@@ -127,10 +119,12 @@ public class MainActivity extends AppCompatActivity {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    showToast("registering, pls wait...");
+                    //showToast("registering, pls wait...");
                     DJISDKManager.getInstance().registerApp(MainActivity.this.getApplicationContext(), new DJISDKManager.SDKManagerCallback() {
+
                         @Override
                         public void onRegister(DJIError djiError) {
+                            showToast("hello from onRegister");
                             if (djiError == DJISDKError.REGISTRATION_SUCCESS) {
                                 showToast("Register Success");
                                 DJISDKManager.getInstance().startConnectionToProduct();
@@ -145,18 +139,19 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "onProductDisconnect");
                             showToast("Product Disconnected");
                             notifyStatusChange();
-
                         }
                         @Override
                         public void onProductConnect(BaseProduct baseProduct) {
+
                             Log.d(TAG, String.format("onProductConnect newProduct:%s", baseProduct));
                             showToast("Product Connected");
                             notifyStatusChange();
 
                         }
 
-
+                        @Override
                         public void onProductChanged(BaseProduct baseProduct) {
+                            showToast("hello from onProductChanged");
                             notifyStatusChange();
                         }
 
@@ -184,34 +179,35 @@ public class MainActivity extends AppCompatActivity {
                         }
                         @Override
                         public void onInitProcess(DJISDKInitEvent djisdkInitEvent, int i) {
-
+                            showToast("hello from init status");
                         }
 
                         @Override
                         public void onDatabaseDownloadProgress(long l, long l1) {
-
+                            showToast("hello from datadownload");
                         }
                     });
                 }
             });
         }
+
     }
     private void notifyStatusChange() {
+        showToast("hello from notify status");
         mHandler.removeCallbacks(updateRunnable);
         mHandler.postDelayed(updateRunnable, 500);
     }
 
     private Runnable updateRunnable = new Runnable() {
-
         @Override
         public void run() {
+            showToast("Hello");
             Intent intent = new Intent(FLAG_CONNECTION_CHANGE);
             sendBroadcast(intent);
         }
     };
 
     private void showToast(final String toastMsg) {
-
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
@@ -219,6 +215,5 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), toastMsg, Toast.LENGTH_LONG).show();
             }
         });
-
     }
 }
